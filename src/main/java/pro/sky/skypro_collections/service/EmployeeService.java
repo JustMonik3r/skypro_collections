@@ -4,60 +4,59 @@ import org.springframework.stereotype.Service;
 import pro.sky.skypro_collections.exceptions.*;
 import pro.sky.skypro_collections.model.Employee;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmployeeService {
-    private final List <Employee> employees = new ArrayList<>();
+    private final Map<String, Employee> employees = new LinkedHashMap<>();
     private static final int EMPLOYEE_MAX_NUMBER = 2;
     public Employee add(String firstName, String lastName) {
 
-        if (employees.size() > EMPLOYEE_MAX_NUMBER) {
-            throw new EmployeesStorageIsFull("Массив сотрудников переополнен.");
-        }
-
+        String key = getKey(firstName, lastName);
         Employee newEmployee = new Employee(firstName, lastName);
 
-        if (employees.contains(newEmployee)) {
+        if (employees.size() > EMPLOYEE_MAX_NUMBER) {
+            throw new EmployeesStorageIsFull("Массив сотрудников переполнен.");
+        }
+
+        if (employees.containsKey(key)) {
             throw new EmployeeAlreadyExist("Такой сотрудник уже есть.");
         }
 
-        employees.add(newEmployee);
+        employees.put (key, newEmployee);
 
         return newEmployee;
     }
 
     public Employee remove(String firstName, String lastName) {
-        Employee employeeForRemove = new Employee(firstName, lastName);
+        String key = getKey(firstName, lastName);
+        Employee employeeForRemoval = employees.get(key);
 
-        if (!employees.contains(employeeForRemove)) {
+        if (!employees.containsKey(key)) {
             throw new EmployeeNotFound("Невозможно удалить. Такого сотрудника не существует.");
         } else {
             System.out.println("Сотрудник удален.");
         }
 
-        employees.remove(employeeForRemove);
-        return employeeForRemove;
+        employees.remove(key);
+        return employeeForRemoval;
     }
 
     public Employee get(String firstName, String lastName) {
-        Employee employeeForSearch = new Employee(firstName, lastName);
+        String key = getKey(firstName, lastName);
 
-        if (!employees.contains(employeeForSearch)) {
+        if (!employees.containsKey(key)) {
             throw new EmployeeNotFound("Указанный сотрудник не найден.");
         }
 
-        Employee result = null;
-        for (Employee employee : employees) {
-            if (employee.equals(employeeForSearch)) {
-                return employee;
-            }
-        }
-        return result;
+        return employees.get(key);
     }
 
-    public List<Employee> getAll() {
-        return employees;
+    public Collection<Employee> getAll() {
+        return employees.values();
+    }
+
+    private String getKey (String firstName, String lastName) {
+        return firstName + lastName;
     }
 }
