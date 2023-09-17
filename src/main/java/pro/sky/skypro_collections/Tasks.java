@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Tasks {
     public static void main(String[] args) {
-        List<Integer> numbers = new ArrayList<>(List.of(100, 13, 23, 33, 42, 43, 51, 52, 61, 74));
+        List<Integer> numbers = new ArrayList<>(List.of(100, 13, 23, 33, 42, 43, 51, 52, 61, 74, 74));
         List<String> strings = new ArrayList<>(List.of("у", "Карла", "у", "Клары", "украла", "кораллы", "Клара", "у", "Карлы", "украла", "кларнет"));
         task1(numbers);
         task2(numbers);

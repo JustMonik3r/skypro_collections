@@ -6,57 +6,16 @@ import pro.sky.skypro_collections.model.Employee;
 
 import java.util.*;
 
-@Service
-public class EmployeeService {
-    private final Map<String, Employee> employees = new LinkedHashMap<>();
-    private static final int EMPLOYEE_MAX_NUMBER = 2;
-    public Employee add(String firstName, String lastName) {
+public interface EmployeeService {
+    Map<String, Employee> employees = new LinkedHashMap<>();
+    int EMPLOYEE_MAX_NUMBER = 2;
+    Employee add(String firstName, String lastName, int department, double salary) ;
 
-        String key = getKey(firstName, lastName);
-        Employee newEmployee = new Employee(firstName, lastName);
+    Employee remove(String firstName, String lastName, int department, double salary);
 
-        if (employees.size() > EMPLOYEE_MAX_NUMBER) {
-            throw new EmployeesStorageIsFull("Массив сотрудников переполнен.");
-        }
+    Employee get(String firstName, String lastName, int department, double salary);
 
-        if (employees.containsKey(key)) {
-            throw new EmployeeAlreadyExist("Такой сотрудник уже есть.");
-        }
+    Collection<Employee> getAll();
 
-        employees.put (key, newEmployee);
-
-        return newEmployee;
-    }
-
-    public Employee remove(String firstName, String lastName) {
-        String key = getKey(firstName, lastName);
-        Employee employeeForRemoval = employees.get(key);
-
-        if (!employees.containsKey(key)) {
-            throw new EmployeeNotFound("Невозможно удалить. Такого сотрудника не существует.");
-        } else {
-            System.out.println("Сотрудник удален.");
-        }
-
-        employees.remove(key);
-        return employeeForRemoval;
-    }
-
-    public Employee get(String firstName, String lastName) {
-        String key = getKey(firstName, lastName);
-
-        if (!employees.containsKey(key)) {
-            throw new EmployeeNotFound("Указанный сотрудник не найден.");
-        }
-
-        return employees.get(key);
-    }
-
-    public Collection<Employee> getAll() {
-        return employees.values();
-    }
-
-    private String getKey (String firstName, String lastName) {
-        return firstName + lastName;
-    }
+    String getKey (String firstName, String lastName, int department, double salary);
 }
