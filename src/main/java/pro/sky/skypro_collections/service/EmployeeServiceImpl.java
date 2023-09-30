@@ -1,6 +1,8 @@
 package pro.sky.skypro_collections.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import pro.sky.skypro_collections.exceptions.BadRequestException;
 import pro.sky.skypro_collections.exceptions.EmployeeAlreadyExist;
 import pro.sky.skypro_collections.exceptions.EmployeeNotFound;
 import pro.sky.skypro_collections.exceptions.EmployeesStorageIsFull;
@@ -21,12 +23,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeesStorageIsFull("Массив сотрудников переполнен.");
         }
 
-        if (employees.containsKey(key)) {
-            throw new EmployeeAlreadyExist("Такой сотрудник уже есть.");
+        if (StringUtils.isAlpha(firstName) || StringUtils.isAlpha(lastName)) {
+            throw new BadRequestException("Имя пользователя содержит запрещенные символы");
+        }
+
+        if (StringUtils.containsIgnoreCase(employees.toString(), key)) {
+            throw new BadRequestException("Такой сотрудник уже есть.");
         }
 
         employees.put (key, newEmployee);
-
         return newEmployee;
     }
 
@@ -34,8 +39,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         String key = getKey(firstName, lastName, department, salary);
         Employee employeeForRemoval = employees.get(key);
 
-        if (!employees.containsKey(key)) {
-            throw new EmployeeNotFound("Невозможно удалить. Такого сотрудника не существует.");
+        if (!StringUtils.containsIgnoreCase(employees.toString(), key)) {
+            throw new BadRequestException("Невозможно удалить. Такого сотрудника не существует.");
         } else {
             System.out.println("Сотрудник удален.");
         }
@@ -47,10 +52,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee get(String firstName, String lastName, int department, double salary) {
         String key = getKey(firstName, lastName, department, salary);
 
-        if (!employees.containsKey(key)) {
+        if (!StringUtils.containsIgnoreCase(employees.toString(), key)) {
             throw new EmployeeNotFound("Указанный сотрудник не найден.");
         }
-
         return employees.get(key);
     }
 
@@ -59,6 +63,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public String getKey (String firstName, String lastName, int department, double salary) {
-        return firstName + lastName + department + salary;
+        return StringUtils.capitalize(firstName) + StringUtils.capitalize(lastName) + department + salary;
     }
 }
