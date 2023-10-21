@@ -1,6 +1,5 @@
 package pro.sky.skypro_collections.controller;
 
-import ch.qos.logback.core.model.conditional.ElseModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,10 +13,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/departments")
-class DepartmentController {
+public class DepartmentController {
     private final DepartmentService departmentService;
 
-    DepartmentController(DepartmentService departmentService) {
+    public DepartmentController(DepartmentService departmentService) {
         this.departmentService = departmentService;
     }
 
@@ -31,13 +30,9 @@ class DepartmentController {
         return departmentService.getEmployeeWithMinSalary(departmentId);
     }
 
-    @GetMapping(value = "/all", params = {"departmentId"})
-    public Collection<Employee> getEmployeesFromDepartment(@RequestParam Integer departmentId){
-        return departmentService.getEmployee(departmentId);
-    }
 
     @GetMapping("/all")
-    public Map<Integer, List<Employee>> getEmployeesFromDepartment(){
-        return departmentService.getEmployee();
+    public Map<Integer, List<Employee>> getEmployeesByDepartment(@RequestParam(required = false) Integer departmentId) {
+        return departmentService.getEmployeesByDepartment(departmentId);
     }
 }

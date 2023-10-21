@@ -3,9 +3,9 @@ package pro.sky.skypro_collections.service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import pro.sky.skypro_collections.exceptions.BadRequestException;
-import pro.sky.skypro_collections.exceptions.EmployeeAlreadyExist;
-import pro.sky.skypro_collections.exceptions.EmployeeNotFound;
-import pro.sky.skypro_collections.exceptions.EmployeesStorageIsFull;
+import pro.sky.skypro_collections.exceptions.EmployeeAlreadyExistException;
+import pro.sky.skypro_collections.exceptions.EmployeeNotFoundException;
+import pro.sky.skypro_collections.exceptions.EmployeesStorageIsFullException;
 import pro.sky.skypro_collections.model.Employee;
 
 import java.util.*;
@@ -19,16 +19,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         String key = getKey(firstName, lastName, department, salary);
         Employee newEmployee = new Employee(firstName, lastName, department, salary);
 
-        if (employees.size() > EMPLOYEE_MAX_NUMBER) {
-            throw new EmployeesStorageIsFull("Массив сотрудников переполнен.");
+        if (employees.size() >= EMPLOYEE_MAX_NUMBER) {
+            throw new EmployeesStorageIsFullException("Массив сотрудников переполнен.");
         }
 
-        if (StringUtils.isAlpha(firstName) || StringUtils.isAlpha(lastName)) {
+        if (!StringUtils.isAlpha(firstName) || !StringUtils.isAlpha(lastName)) {
             throw new BadRequestException("Имя пользователя содержит запрещенные символы");
         }
 
         if (StringUtils.containsIgnoreCase(employees.toString(), key)) {
-            throw new BadRequestException("Такой сотрудник уже есть.");
+            throw new EmployeeAlreadyExistException("Такой сотрудник уже есть.");
         }
 
         employees.put (key, newEmployee);
@@ -42,18 +42,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!StringUtils.containsIgnoreCase(employees.toString(), key)) {
             throw new BadRequestException("Невозможно удалить. Такого сотрудника не существует.");
         } else {
-            System.out.println("Сотрудник удален.");
+            employees.remove(key, employeeForRemoval);
+            employeeForRemoval = null;
+            return employeeForRemoval;
         }
-
-        employees.remove(key);
-        return employeeForRemoval;
     }
 
     public Employee get(String firstName, String lastName, int department, double salary) {
         String key = getKey(firstName, lastName, department, salary);
 
         if (!StringUtils.containsIgnoreCase(employees.toString(), key)) {
-            throw new EmployeeNotFound("Указанный сотрудник не найден.");
+            throw new EmployeeNotFoundException("Указанный сотрудник не найден.");
         }
         return employees.get(key);
     }
